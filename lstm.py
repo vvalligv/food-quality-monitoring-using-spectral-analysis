@@ -11,35 +11,40 @@ import matplotlib.pyplot as plt
 #dataset reading
 file_path = 'cleaned_dataset.csv'
 test_file_path='test_dataset.csv'
-load(train,test)
+
 
 # Load the dataset from CSV file
 def load(train,test):
 
-  df = pd.read_csv(file_path)
-  test_df= pd.read_csv(test_file_path)
+  df = pd.read_csv(train)
+  test_df= pd.read_csv(test)
+  return df,test_df
 
+df ,test_df =load(file_path,test_file_path)
 
 # Assuming 'att1' is the target variable
 # Specify the target column
+target_column = 'att1'
+test_target_column = 'att1'
 
+def shape(df,test_df,target_column,test_target_column):
+    target = df[target_column].values.reshape(-1, 1)
+  
+    test_target = test_df[test_target_column].values.reshape(-1, 1)
+  
+    return target,test_target
 
-def shape(trvalue,tesvalue):
-  target_column = 'att1'
-  test_target_column = 'att1'
-  target = df[target_column].values.reshape(-1, 1)
-  test_target = test_df[test_target_column].values.reshape(-1, 1)
-
-shape(target, test_target)
+target,test_target=shape(df,test_df,target_column,test_target_column)
 
 # Use MinMaxScaler to scale the data between 0 and 1
 
-def scale(trscale,tesscale):
+def scale(target,test_target):
   scaler = MinMaxScaler(feature_range=(0, 1))
   target_scaled = scaler.fit_transform(target)
   test_target_scaled = scaler.transform(test_target)
+  return target_scaled, test_target_scaled
 
-scale(target_scaled,test_target_scaled)
+target_scaled,test_target_scaled=scale(target,test_target)
 
 # Define a function to create time series sequences
 def create_sequences(data, seq_length):
@@ -159,7 +164,6 @@ plt.legend()
 
 plt.tight_layout()
 plt.show()
-
 
 
 
