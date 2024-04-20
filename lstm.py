@@ -9,8 +9,7 @@ from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler
 import matplotlib.pyplot as plt
 
 #dataset reading
-file_path = 'cleaned_dataset.csv'
-test_file_path='test_dataset.csv'
+
 
 
 # Load the dataset from CSV file
@@ -20,7 +19,7 @@ def load(train,test):
   test_df= pd.read_csv(test)
   return df,test_df
 
-df ,test_df =load(file_path,test_file_path)
+df ,test_df =load("cleaned_dataset.csv","test_dataset.csv")
 
 # Assuming 'att1' is the target variable
 # Specify the target column
