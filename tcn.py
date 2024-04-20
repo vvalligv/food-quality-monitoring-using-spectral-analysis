@@ -18,7 +18,7 @@ def load(train,test):
   test_df=pd.read_csv(test)
   return df,test_df
 
-df,test_df=load(file_path,test_file_path)
+df,test_df=load("cleaned_dataset.csv","test_dataset.csv")
 
 # Assuming 'att1' is the target variable
 # Specify the target column
