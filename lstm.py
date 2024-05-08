@@ -5,35 +5,25 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import accuracy_score
-from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler
+from tensorflow. keras.callbacks import EarlyStopping, LearningRateScheduler
 import matplotlib.pyplot as plt
 
+
 #dataset reading
-
-
+path = "cleaned_dataset.csv"
+path1 = "test_dataset.csv"
 
 # Load the dataset from CSV file
-def load(train,test):
+def load(path):
+    df = pd.read_csv(path)
+    return df
 
-  df = pd.read_csv(train)
-  test_df= pd.read_csv(test)
-  return df,test_df
-
-df ,test_df =load("cleaned_dataset.csv","test_dataset.csv")
-
-# Assuming 'att1' is the target variable
-# Specify the target column
 target_column = 'att1'
 test_target_column = 'att1'
 
-def shape(df,test_df,target_column,test_target_column):
+def shape(df,target_column):
     target = df[target_column].values.reshape(-1, 1)
-  
-    test_target = test_df[test_target_column].values.reshape(-1, 1)
-  
-    return target,test_target
-
-target,test_target=shape(df,test_df,target_column,test_target_column)
+    return target
 
 # Use MinMaxScaler to scale the data between 0 and 1
 
@@ -42,6 +32,12 @@ def scale(target,test_target):
   target_scaled = scaler.fit_transform(target)
   test_target_scaled = scaler.transform(test_target)
   return target_scaled, test_target_scaled
+
+df = load(path)
+test_df = load(path1)
+
+target=shape(df,target_column)
+test_target = shape(test_df,test_target_column)
 
 target_scaled,test_target_scaled=scale(target,test_target)
 
@@ -59,27 +55,8 @@ X = create_sequences(target_scaled, sequence_length)
 y = target_scaled[sequence_length:]
 X_train =X
 y_train=y
-
-
-
-
-# Load the testing dataset from CSV file
-#test_file_path = 'test_dataset.csv'  # Replace with the path to your testing CSV file
-#test_df = pd.read_csv(test_file_path)
-
-# Assuming 'att1' is the target variable
-# Specify the target column
-#test_target_column = 'att1'
-#test_target = test_df[test_target_column].values.reshape(-1, 1)
-
-# Use MinMaxScaler to scale the testing data between 0 and 1
-#test_target_scaled = scaler.transform(test_target)
-
-# Set the sequence length and create sequences for testing set
 X_test = create_sequences(test_target_scaled, sequence_length)
 y_test = test_target_scaled[sequence_length:]
-
-
 
 # Build a more complex LSTM model
 model = tf.keras.models.Sequential([
@@ -137,7 +114,6 @@ for epoch in range(1, 101):  # Adjust the range based on the number of epochs
     if early_stopping.stopped_epoch > 0:
         print(f"Training stopped at epoch {epoch} due to early stopping.")
         break
-
 
 # Print final accuracy
 final_accuracy = epoch_accuracies[-1]
