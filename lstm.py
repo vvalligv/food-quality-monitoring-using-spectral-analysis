@@ -3,9 +3,15 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler#This scaler from the sklearn.preprocessing module is used to scale features to a given range, usually [0, 1]. 
+#It normalizes the data so that it fits within this range.
+
+from sklearn.metrics import accuracy_score#This function from the sklearn.metrics module calculates the accuracy of a classification model.
 from tensorflow. keras.callbacks import EarlyStopping, LearningRateScheduler
+#Early stopping: is used to stop training when a monitored metric has stopped improving.
+#It helps to prevent overfitting by stopping training when the model’s performance on the validation set starts to degrade.
+#LearningRateScheduler: This callback allows you to adjust the learning rate of the model during training based on a given schedule or function.
+#This can help improve model performance.
 import matplotlib.pyplot as plt
 
 
@@ -16,13 +22,20 @@ path1 = "test_dataset.csv"
 # Load the dataset from CSV file
 def load(path):
     df = pd.read_csv(path)
-    return df
+    return df  # Loads the csv file and returns as the dataframe
 
 target_column = 'att1'
 test_target_column = 'att1'
 
 def shape(df,target_column):
     target = df[target_column].values.reshape(-1, 1)
+    #Example: If target_column is 'age', df['age'] gives you the values of the 'age' column.
+    # For .values:For instance, if df['age'] is [25, 30, 35], then df['age'].values would be array([25, 30, 35])
+    #Example: If the array is [25, 30, 35], reshaping it with (-1, 1) will convert it to Reshaped 2D Column Vector:
+#[[25]
+ #[30]
+ #[35]]
+    #Using -1 means you don't have to manually calculate the number of rows, reducing the chance of errors and simplifying the code.
     return target
 
 # Use MinMaxScaler to scale the data between 0 and 1
