@@ -20,4 +20,6 @@ for i in range(5): # Here, we use for loop for plotting 5 columns from dataset u
 plt.tight_layout()--> #make graphs not to overlap
 plt.show()-->#shows the plot
 
-
+#Histograms are essential for understanding the distribution
+#and frequency of numerical data, helping to visualize and analyze
+#patterns, compare different datasets, and identify any anomalies or outliers.
