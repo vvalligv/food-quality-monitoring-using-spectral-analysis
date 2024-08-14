@@ -150,3 +150,9 @@ plt.legend()
 
 plt.tight_layout()
 plt.show()
+
+#ReLU activation function nnu sollum pothu, oru input value positive-a irundhaal, atha mathriya output kidaikkum. 
+#Negative-a irundhaal, output-a 0 kidaikkum. For example, 5 input kudutha, 5-a than output kidaikkum. But -3 input kudutha, 0-a output kidaikkum.
+
+#ReLU use panra reason, 
+#athu simple-a irukkum, and it helps the network to learn complex patterns without vanishing gradients problem."**
