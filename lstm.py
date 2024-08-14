@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 #dataset reading
 path = "cleaned_dataset.csv"
-path1 = "test_dataset.csv"
+path1 = "test_dataset.csv"  # first, in training dtataset it is trained, and then in test dataset, it is evaluated.
 
 # Load the dataset from CSV file
 def load(path):
@@ -36,7 +36,8 @@ def shape(df,target_column):
  #[30]
  #[35]]
     #Using -1 means you don't have to manually calculate the number of rows, reducing the chance of errors and simplifying the code.
-    return target
+    return target   # Dataset load pannina apram, target column-a reshape pannina, model ku correct-a format-la data kudukalam. 
+    #Ippo, scaling or training ellam easy-a nadakum."
 
 # Use MinMaxScaler to scale the data between 0 and 1
 
@@ -44,7 +45,8 @@ def scale(target,test_target):
   scaler = MinMaxScaler(feature_range=(0, 1))
   target_scaled = scaler.fit_transform(target)
   test_target_scaled = scaler.transform(test_target)
-  return target_scaled, test_target_scaled
+  return target_scaled, test_target_scaled    #Training data-a scale pannitu, adhe scaling-a eduthutu test data-kum apply pannum.
+   # Ippo rendu datasets-um 0 to 1 range-la irukum, which makes it easier for the LSTM model to train and predict correctly.
 
 df = load(path)
 test_df = load(path1)
