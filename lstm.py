@@ -35,6 +35,14 @@ def shape(df,target_column):
 #[[25]
  #[30]
  #[35]]
+
+    #| Code             | Output Shape | Meaning                            |
+| ---------------- | ------------ | ---------------------------------- |
+#| `reshape(-1, 1)` | (n, 1)       | Column vector                      |
+#| `reshape(1, -1)` | (1, n)       | Row vector                         |
+#| `reshape(n,)`    | (n,)         | 1D vector (original shape)         |
+#| `reshape(3, 2)`  | (3, 2)       | Reshape manually to 3 rows, 2 cols |
+
     #Using -1 means you don't have to manually calculate the number of rows, reducing the chance of errors and simplifying the code.
     return target   # Dataset load pannina apram, target column-a reshape pannina, model ku correct-a format-la data kudukalam. 
     #Ippo, scaling or training ellam easy-a nadakum."
