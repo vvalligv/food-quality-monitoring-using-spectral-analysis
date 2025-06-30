@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler #StandardScaler used for standa
 #The library is designed to be easy to use and integrate well with other Python scientific computing libraries.
 
 # Load the dataset
-data = pd.read_csv('output_dataset.csv')  # Replace 'your_dataset.csv' with the actual filename
+data = pd.read_csv('output.csv')  
 
 # Print the shape of the original dataset
 print("Original dataset shape:", data.shape)#original dataset shape is printed like how many rows,how many columns
@@ -34,9 +34,9 @@ print("y shape:", y.shape)#Y shape, indicates Y shape --> target variable shape
 
 # Handle outliers using the IQR method
 def handle_outliers(df, column):
-    Q1 = df[column].quantile(0.25)  
+    Q1 = df[column].quantile(0.25)
     Q3 = df[column].quantile(0.75)
-    
+
     #Q1 Position: 0.25 * (N + 1) where N is the number of data points.
     #Q3 Position: 0.75 * (N + 1)
     #Interpolate Values  Example:
@@ -54,7 +54,7 @@ def handle_outliers(df, column):
     #Example over
 
     IQR = Q3 - Q1
-    
+
 #Why Use 3.0 Instead of 1.5:
 
 #More Stringent Criteria: Using a multiplier of 3.0 makes the criteria for identifying outliers more stringent. It expands the range of what is considered "normal" and thus identifies fewer extreme values as outliers.
@@ -68,12 +68,12 @@ def handle_outliers(df, column):
     return df
 
 # Create a copy of the original dataset for handling outliers
-X_outliers_removed = X.copy() 
+X_outliers_removed = X.copy()
 
 # Handle outliers for each numerical column
 numerical_columns = X.select_dtypes(include=['float64']).columns #Numerical columns are identified
 for column in numerical_columns: # each numerical column is iterated
-    X_outliers_removed = handle_outliers(X_outliers_removed, column)--> #Purpose: This line calls the handle_outliers function for the current column being processed, and updates X_outliers_removed with the result.
+    X_outliers_removed = handle_outliers(X_outliers_removed, column) #Purpose: This line calls the handle_outliers function for the current column being processed, and updates X_outliers_removed with the result.
 #handle_outliers(X_outliers_removed, column): This function is designed to identify and remove outliers in the specified column of the DataFrame X_outliers_removed.
 
 # Print the shape of the dataset after handling outliers
@@ -86,52 +86,10 @@ y = y.loc[X_outliers_removed.index]
 #Original y: [0, 1, 0, 1, 1]
 #Indices of X_outliers_removed: Suppose indices [0, 1, 2, 3] remain.
 #Updated y: After y.loc[X_outliers_removed.index], y will be [0, 1, 0, 1] (values corresponding to indices [0, 1, 2, 3]).
+# Combine cleaned features with target
+final_cleaned_df = X_outliers_removed.copy()
+final_cleaned_df['target'] = y  # Add the updated target aligned with cleaned features
 
-# Print the cleaned dataset after handling outliers
-print("\nCleaned Dataset after handling outliers:")
-print(X_outliers_removed)
-
-
-
-# Standardize numerical features (optional, depending on your model)
-scaler = StandardScaler()
-#Create an instance of the StandardScaler class from sklearn.preprocessing.
-#This object will be used to compute the mean and standard deviation of the features and then use these statistics to transform the data.
-
-#example 
-#First, mean and standard deviation is calculated for each column, 
-#and then: each value - mean/standard deviation. is done
-
-X_train_scaled = scaler.fit_transform(X_outliers_removed) #This method simultaneously fits the scaler to the data (calculates the necessary statistics) and applies the transformation to the data.
-#fit(): Computes the mean and standard deviation for each numerical feature in X_outliers_removed.
-#transform(): Uses the computed mean and standard deviation to scale each feature such that the resulting feature values have a mean of 0 and a standard deviation of 1.
-#X_train_scaled will contain the standardized version of X_outliers_removed, where each feature is scaled accordingly.
-
-
-# Now, X_train_scaled and X_test_scaled contain the standardized features,
-# and y_train, y_test contain the target variable.
-
-# Additional data cleaning or preprocessing steps can be added based on specific requirements.
-
-# Display sample rows of X_train and y_train
-print("\nSample X_train:")
-print(X_train_scaled)
-#Since X_train_scaled is a NumPy array (as returned by fit_transform), the printed output will be in array format. 
-#Each row corresponds to an observation, and each column corresponds to a feature.
-
-print("\nSample y_train:")
-print(y.head())
-
-# Save the cleaned dataset to a CSV file
-X_outliers_removed.to_csv('cleaned_dataset.csv', index=False)
-
-#index=False: Excludes row indices from the CSV file.
-#index=True: Includes row indices in the CSV file.
-
-# Load the cleaned dataset from a CSV file
-cleaned_data = pd.read_csv('cleaned_dataset.csv')
-
-#y usually represents the target variable or dependent variable that your machine learning model aims to predict.
-#X typically represents the feature matrix or set of independent variables in your machine learning dataset.
-#The training dataset is used to train the machine learning model. It consists of a set of input-output pairs or examples.The test dataset is used to evaluate the
-#performance of the trained machine learning model.
+# Save combined dataset (features + target)
+final_cleaned_df.to_csv('final_cleaned_dataset.csv', index=False)
+print("✅ Saved combined cleaned dataset with target as final_cleaned_dataset.csv")
