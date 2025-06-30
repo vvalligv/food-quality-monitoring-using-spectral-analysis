@@ -173,46 +173,45 @@ from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler
 
-# Step 1: Load cleaned dataset (features + target)
-df = pd.read_csv("final_cleaned_dataset.csv")  # This includes the 'target' column
+# Step 1: Load cleaned training dataset
+df = pd.read_csv("final_cleaned_dataset.csv")  # Contains features + target
 
-# Step 2: Split into features (X) and target (y)
+# Step 2: Split into features and target
 X = df.drop(columns=['target'])
 y = df['target']
 
 # Step 3: Scale features using MinMaxScaler
 scaler = MinMaxScaler()
-X_scaled = scaler.fit_transform(X)
+X_scaled = scaler.fit_transform(X)  # Fit on training set
 
-# Step 4: Create sequences
+# Step 4: Create sequences function
 def create_sequences(X, y, seq_length=20):
-    X_seq = []
-    y_seq = []
+    X_seq, y_seq = [], []
     for i in range(len(X) - seq_length):
         X_seq.append(X[i:i + seq_length])
-        y_seq.append(y[i + seq_length])  # predict next step target
+        y_seq.append(y[i + seq_length])  # Predict next-step target
     return np.array(X_seq), np.array(y_seq)
 
 sequence_length = 20
 X_seq, y_seq = create_sequences(X_scaled, y.values, sequence_length)
 
-# Step 5: Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X_seq, y_seq, test_size=0.2, random_state=42)
+# Step 5: Train-test split for training/validation
+X_train, X_val, y_train, y_val = train_test_split(X_seq, y_seq, test_size=0.2, random_state=42)
 
 # Step 6: Build the LSTM model
 model = tf.keras.models.Sequential([
     tf.keras.layers.LSTM(100, return_sequences=True, input_shape=(sequence_length, X.shape[1])),
-    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dropout(0.1),
     tf.keras.layers.LSTM(100),
-    tf.keras.layers.Dropout(0.2),
-    tf.keras.layers.Dense(1, activation='sigmoid')  # binary output
+    tf.keras.layers.Dropout(0.1),
+    tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
 # Step 7: Compile model
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-# Step 8: Set early stopping and LR scheduler
-early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+# Step 8: Callbacks
+early_stopping = EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True)
 
 def lr_schedule(epoch):
     return 0.001 * np.exp(-0.1 * epoch)
@@ -222,21 +221,40 @@ lr_scheduler = LearningRateScheduler(lr_schedule)
 # Step 9: Train the model
 history = model.fit(
     X_train, y_train,
-    validation_data=(X_test, y_test),
+    validation_data=(X_val, y_val),
     epochs=50,
     batch_size=32,
     callbacks=[early_stopping, lr_scheduler],
     verbose=2
 )
 
-# Step 10: Evaluate the model
-y_pred_prob = model.predict(X_test)
-y_pred = (y_pred_prob > 0.5).astype(int)
+# Step 10: Evaluate on validation set
+y_val_pred_prob = model.predict(X_val)
+y_val_pred = (y_val_pred_prob > 0.5).astype(int)
 
-accuracy = accuracy_score(y_test, y_pred)
-print(f"\n✅ Final Test Accuracy: {accuracy:.2%}")
+val_accuracy = accuracy_score(y_val, y_val_pred)
+print(f"\n Validation Accuracy: {val_accuracy:.2%}")
 
-# Step 11: Plot Accuracy & Loss
+# Step 11: Load and prepare external test dataset
+test_df = pd.read_csv("cleaned_test_dataset.csv")
+X_test_raw = test_df.drop(columns=['target'])
+y_test_actual = test_df['target']
+
+# Use the same scaler (fitted on training data)
+X_test_scaled = scaler.transform(X_test_raw)
+
+# Create sequences from external test data
+X_test_seq, y_test_seq = create_sequences(X_test_scaled, y_test_actual.values, sequence_length)
+
+# Step 12: Predict on external test data
+y_test_pred_prob = model.predict(X_test_seq)
+y_test_pred = (y_test_pred_prob > 0.5).astype(int)
+
+# Accuracy on external test set
+external_test_acc = accuracy_score(y_test_seq, y_test_pred)
+print(f"\n External Test Dataset Accuracy: {external_test_acc:.2%}")
+
+# Step 13: Plot Accuracy & Loss curves
 plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
 plt.plot(history.history['accuracy'], label='Train Acc')
